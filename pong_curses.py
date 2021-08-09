@@ -10,6 +10,7 @@ class player:
     y = 0
     key_up = 0
     key_down = 0
+    score = 0
 
     def move(self, x, y):
         self.x = x
@@ -49,14 +50,15 @@ def ball_touch_player(player_x, player_y, ball_x, ball_y):
     if player_x == ball_x or player_x == ball_x+1:
         if ball_y >= player_y and ball_y <= player_y + 10:
             return 1
-        # else:
-        #   return 0
+        else:
+            return 0
     else:
         return 0
 
 
-def restart_game(height, width, ball, player):
-    player.move(int(width/10), int(height/2-(5)))
+def restart_game(height, width, ball, player1, player2):
+    player1.move(int(width/10), int(height/2-(5)))
+    player2.move(int(width-(width/10)), int(height/2-(5)))
     ball.move_ball(width//2, height//2)
 
 
@@ -64,6 +66,8 @@ def pong_game(stdscr):
 
     # quit variable
     k = 0
+    l = 0
+
     # getch is no blocking function after this call
     stdscr.nodelay(True)
     # Clear and refresh the screen for a blank canvas
@@ -83,6 +87,13 @@ def pong_game(stdscr):
     player1.move(int(width/10), int(height/2-(5)))
     player1.draw_player(stdscr)
 
+    # creat second player
+    player2 = player()
+    player2.key_up = 122  # z character
+    player2.key_down = 115  # s character
+    player2.move(width-(int(width/10)), int(height/2-(5)))
+    player2.draw_player(stdscr)
+
     # create ball
     ball_game = ball(height, width)
     ball_game.draw_ball(stdscr)
@@ -93,7 +104,8 @@ def pong_game(stdscr):
         # Refresh screen
         stdscr.clear()
         height, width = stdscr.getmaxyx()
-        stdscr.addstr(5, width//3, "SCORE : "+str(score))
+        stdscr.addstr(5, width//2 - 10, "SCORE PLAYER 1 : "+str(player1.score))
+        stdscr.addstr(5, width//2 + 10, "SCORE PLAYER 2 : "+str(player2.score))
 
         # draw middle line
         stdscr.vline(0, int(width/2), height-1, int(width/2))
@@ -103,22 +115,29 @@ def pong_game(stdscr):
             player1.y += 1
         elif k == player1.key_up and player1.y - 1 >= 0:
             player1.y -= 1
+        elif k == player2.key_down and player2.y + 1 < height-10:
+            player2.y += 1
+        elif k == player2.key_up and player2.y - 1 >= 0:
+            player2.y -= 1
         else:
             pass
 
-        # deal with player
+        # deal with players
         player1.move(player1.x, player1.y)
         player1.draw_player(stdscr)
+        player2.move(player2.x, player2.y)
+        player2.draw_player(stdscr)
 
         # deal with the ball
-        if ball_game.x-1 < 0:
-            restart_game(height, width, ball_game, player1)
-            score += 1
-        elif ball_game.x+2 > width:
-            ball_game.reverse_x_speed()
+        if ball_game.x-1 < 0 or ball_game.x+1 >= width:
+            if ball_game.x < width//2:
+                player2.score += 1
+            else:
+                player1.score += 1
+            restart_game(height, width, ball_game, player1, player2)
         elif ball_game.y+2 > height or ball_game.y-1 < 0:
             ball_game.reverse_y_speed()
-        elif ball_touch_player(player1.x, player1.y, ball_game.x, ball_game.y) == 1:
+        elif ball_touch_player(player1.x, player1.y, ball_game.x, ball_game.y) == 1 or ball_touch_player(player2.x, player2.y, ball_game.x, ball_game.y) == 1:
             ball_game.reverse_x_speed()
 
         ball_game.x += ball_game.speed_x
@@ -137,3 +156,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+# le probleme de k et l c'est que l'on ne peux pas rester appuyer sur une touche
