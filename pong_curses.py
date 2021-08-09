@@ -87,7 +87,7 @@ def pong_game(stdscr):
     player1.move(int(width/10), int(height/2-(5)))
     player1.draw_player(stdscr)
 
-    # creat second player
+    # create second player
     player2 = player()
     player2.key_up = 122  # z character
     player2.key_down = 115  # s character
@@ -104,8 +104,8 @@ def pong_game(stdscr):
         # Refresh screen
         stdscr.clear()
         height, width = stdscr.getmaxyx()
-        stdscr.addstr(5, width//2 - 10, "SCORE PLAYER 1 : "+str(player1.score))
-        stdscr.addstr(5, width//2 + 10, "SCORE PLAYER 2 : "+str(player2.score))
+        stdscr.addstr(5, width//2 - 40, "SCORE PLAYER 1 : "+str(player1.score))
+        stdscr.addstr(5, width//2 + 20, "SCORE PLAYER 2 : "+str(player2.score))
 
         # draw middle line
         stdscr.vline(0, int(width/2), height-1, int(width/2))
